@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from geoalchemy2 import Geography
 from sqlalchemy import (bindparam, create_engine, text, DateTime,
@@ -31,14 +32,25 @@ class ObservingFacility(Base):
     __tablename__ = "observing_facility"
     __table_args__ = {"schema":"wmdr"}
     id: Mapped[int] = mapped_column(primary_key=True)
-    wsi: Mapped[str] = mapped_column(nullable=False)
+    wsi: Mapped[str] = mapped_column(nullable=False, unique=True)
     name: Mapped[str] = mapped_column(nullable=False)
     extension = mapped_column(JSONB, nullable=True)
-    date_established: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    date_established: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     date_closed: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     wmo_region: Mapped[str] = mapped_column(ForeignKey("wmdr.wmo_region_code_list.notation"))
     facility_type: Mapped[str] = mapped_column(ForeignKey("wmdr.facility_type_code_list.notation"))
+    alias: Mapped[List["ObservingFacilityAlias"]] = relationship(
+        back_populates="facility", cascade="all, delete-orphan"
+    )
     # To do - add unique constraint on wsi
+
+class ObservingFacilityAlias(Base):
+    __tablename__ = "observing_facility_alias"
+    __table_args__ = {"schema":"wmdr"}
+    id: Mapped[int] = mapped_column(primary_key=True)
+    alias: Mapped[str] = mapped_column(nullable=False, unique=True)
+    facility_id: Mapped[int] = mapped_column(ForeignKey("wmdr.observing_facility.id"), nullable=False)
+    facility: Mapped["ObservingFacility"] = relationship(back_populates="alias")
 
 
 class FacilityDescription(FacilityChildTable):

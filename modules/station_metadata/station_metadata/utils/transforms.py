@@ -4,6 +4,8 @@ from pathlib import Path
 import re
 from urllib.parse import urlparse
 
+from station_metadata.schema.master_data.observing_facility import *
+
 from lxml import etree
 
 THISDIR = os.path.dirname(os.path.realpath(__file__))
@@ -35,6 +37,14 @@ def extract_observing_facility(input_xml):
     record = str(transform(input_xml))
     # convert to dict
     data = json.loads(record)
+    # check if we have aliases
+    wsi_list = data['wsi'].split(',')
+    data['wsi'] = wsi_list[0]
+    aliases = list()
+    for idx in range(len(wsi_list)):
+        aliases.append(ObservingFacilityAlias(alias=wsi_list[idx]))
+
+    data['alias'] = aliases
     # remove T and Z from date elements
     data["date_established"] = fix_timestamp(data["date_established"])
     data["date_closed"] = fix_timestamp(data["date_closed"])
@@ -57,7 +67,11 @@ def extract_facility_description(input_xml, facility_id = None):
     for line in record.splitlines():
         if len(line) == 0:
             continue
-        data = json.loads(line)
+        try:
+            data = json.loads(line)
+        except Exception as e:
+            print(line)
+            raise e
         # fix fields
         data["facility_id"] = facility_id
         data["valid_from"] = fix_timestamp(data["valid_from"])
@@ -75,6 +89,7 @@ def extract_facility_location(input_xml, facility_id = None):
     # extract record
     record = str(transform(input_xml))
     for line in record.splitlines():
+        print(line)
         if len(line) == 0:
             continue
         # convert to dict
@@ -104,7 +119,11 @@ def extract_facility_online_resource(input_xml, facility_id = None):
         if len(line) == 0:
             continue
         # convert to dict
-        data = json.loads(line)
+        try:
+            data = json.loads(line)
+        except Exception as e:
+            print(line)
+            raise e
         data["facility_id"] = facility_id
         del data['wsi']
         yield data

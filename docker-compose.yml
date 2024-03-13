@@ -1,0 +1,144 @@
+version: '3.3'
+
+services:
+
+  # container database to host
+  # - pygeoapi job manager
+  # - database of WIGOS metadata
+  # - database of observations
+  # - provenance and archive of files
+  # - crontabs / scheduled tasks?
+
+  # redis manager for download queue and celery tasks
+  redis:
+    container_name: redis
+    build:
+      context: ./containers/redis
+      dockerfile: Dockerfile
+    ports:
+      - 6379:6379
+
+  database:
+    build:
+      context: .
+      dockerfile: ./containers/postgresql/Dockerfile
+    container_name: wis2box-dm-db
+    ports:
+      - 5432:5432
+    env_file:
+      - default.env
+    volumes:
+      - "./:/local/app"
+      - postgres:/home/postgres
+  # container for pygeoapi, everything as a process
+  api:
+    build:
+      context: ./containers/pygeoapi/
+      dockerfile: Dockerfile
+    container_name: wis2box-dm-api
+    env_file:
+      - default.env
+    ports:
+      - 5001:5001
+    volumes:
+      - ./config/pygeoapi:/config
+      - ./data/pygeoapi:/data # ToDo - fix paths
+      - ./tmp/pygeoapi:/tmp # ToDo - fix paths
+      - ./app:/app
+    tty: true
+#  entrypoint: ["wis2box-dm","api","serve"]
+
+  subscription_manager:
+    container_name: subscription_manager
+    build:
+      context: .
+      dockerfile: ./containers/subscription_manager/Dockerfile
+    ports:
+      - 5002:5001
+    user: 1001:1001
+    env_file:
+      - default.env
+    environment:
+      - DATA=/data
+    volumes:
+      - "./downloads/:/data"
+      - "./:/local/app"
+    tty: true
+    depends_on:
+      - redis
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+      dockerfile: ./containers/celery/Dockerfile
+    volumes:
+      - ./downloads/:/data
+      - ./:/local
+    env_file:
+      - default.env
+    environment:
+      - DATA=/data
+    tty: true
+    depends_on:
+      - redis
+
+  # Message broker for publishing WIS2 notifications
+  # and internal message bus
+  #broker:
+  #  build:
+  #    context: .
+  #    dockerfile: ./containers/mosquitto/Dockerfile
+  #  container_name: wis2box-dm-broker
+  #  env_file:
+  #    - default.env
+  #  ports:
+  #    - "1883:1883"
+  #  volumes:
+  #    - ./config/mosquitto:/mosquitto/config
+  #bucket:
+  #  build:
+  #    context: .
+  #    dockerfile: ./containers/minio/Dockerfile
+  #  container_name: wis2box-dm-bucket
+  #  ports:
+  #    - "9000:9000"
+  #    - "9001:9001"##
+
+  # container with login to manage cron jobs etc
+  manager:
+    build:
+      context: .
+      dockerfile: ./containers/ubuntu/Dockerfile
+    container_name: wis2box-dm-manager
+    volumes:
+      - "./:/local/app"
+    env_file:
+      - default.env
+    tty: true
+  #proxy:
+  #  build:
+  #    context: .
+  #    dockerfile: ./containers/nginx/Dockerfile
+  #  container_name: wis2box-dm-proxy
+  #auth:
+  #  build:
+  #    context: .
+  #    dockerfile: ./containers/keycloak/Dockerfile
+  #  container_name: wis2box-dm-auth
+  #django:
+  #  build:
+  #    context: .
+  #    dockerfile: ./containers/django/Dockerfile
+  #  command: python3 manage.py runserver 0.0.0.0:8000
+  #  volumes:
+  #    - .:/code
+  #  ports:
+  #    - 8000:8000
+  #  env_file:
+  #    default.env
+  #  depends_on:
+  #    - db
+
+volumes:
+  postgres:

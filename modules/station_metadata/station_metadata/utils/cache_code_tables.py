@@ -107,7 +107,7 @@ for domain in domains:
     # remove ''@en from description
     entries['description'] = entries['description'].str.replace(r"'|@en", "",regex=True)
     buffer = StringIO()
-    entries[ ['notation','domain','label','description','uri','type','status'] ].to_csv(buffer, sep="|", quoting=None, index=False)
+    entries[ ['domain','notation','label','description','uri','type','status'] ].to_csv(buffer, sep="|", quoting=None, index=False)
     buffer.seek(0)
     cursor.copy_expert(f"COPY wmdr.{table}_code_list FROM STDIN WITH CSV HEADER DELIMITER AS '|'",buffer)
 
@@ -170,3 +170,6 @@ for key,scheme in schemes.items():
 
 session.commit()
 session.close()
+
+# The following is missing from the code list
+# insert into wmdr.program_affiliation_code_list values ('ANTON','ANTON','Antarctic Observing Network','http://codes.wmo.int/wmdr/ProgramAffiliation/ANTON','skos:Concept','deprecated');
