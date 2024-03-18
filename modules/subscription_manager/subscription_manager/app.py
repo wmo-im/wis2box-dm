@@ -60,7 +60,7 @@ def create_app(test_config=None):
 
     @app.route('/wis2/subscriptions/list')
     def list_subscriptions():
-        return subs
+        return subscriber.active_subscriptions
 
     @app.route('/wis2/subscriptions/add')
     def add_subscription():

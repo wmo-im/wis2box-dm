@@ -1,0 +1,15 @@
+fiona
+netCDF4
+pandas
+psycopg2
+pygeofilter[backend-sqlalchemy]
+pygeoif
+pygeometa
+scipy
+sodapy
+xarray
+zarr
+flask-cors
+sqlalchemy_utils
+sqlalchemy_json
+jinja2

@@ -1,0 +1,362 @@
+server:
+    bind:
+        host: 0.0.0.0
+        port: 5001
+    url: /
+    mimetype: application/json; charset=UTF-8
+    encoding: utf-8
+    languages:
+        - en-US
+    limit: 500
+    map:
+        url: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+        attribution: <a href="https://osm.org/copyright">OpenStreetMap</a> contributors
+    templates:
+        path: /config/templates/
+        static: /config/static/
+    manager:
+        name: TinyDB
+        connection: /tmp/pygeoapi-process-manager.db
+        output_dir: /tmp/
+    cors: true
+
+logging:
+    level: DEBUG
+    logfile: /tmp/pygeoapi.log
+
+metadata:
+    identification:
+        title:
+            en: WIS2box Data Management API
+        description:
+            en: |-
+                PygeoAPI instance deployed to supplement primary WIS2 box API container
+        keywords:
+            en:
+                - wmo
+                - wis 2.0
+        keywords_type: theme
+        terms_of_service: https://public.wmo.int/en/our-mandate/what-we-do/observations/Unified-WMO-Data-Policy-Resolution
+        url: https://community.wmo.int/activity-areas/wis/wis2-implementation
+    license:
+        name: Unified WMO Data Policy
+        url: https://public.wmo.int/en/our-mandate/what-we-do/observations/Unified-WMO-Data-Policy-Resolution
+    provider:
+        name: OpenCDMS
+        url: https://www.opencdms.org
+    contact:
+        name: Lastname, Firstname123
+        position: Position Title
+        address: Mailing Address
+        city: City
+        stateorprovince: Administrative Area
+        postalcode: Zip or Postal Code
+        country: Country
+        phone: +xx-xxx-xxx-xxxx
+        fax: +xx-xxx-xxx-xxxx
+        email: you@example.org
+        url: https://example.org
+        hours: Mo-Fr 08:00-17:00
+        instructions: During hours of service. Never off!
+        role: pointOfContact
+
+resources:
+    hello-world:  # name of process
+        type: process  # REQUIRED (collection, process, or stac-collection)
+        processor:
+            name: HelloWorld  # Python path of process definition
+    WIS2_SYNOP:
+        type: collection
+        title: SYNOP downloaded from the WIS2.0
+        description: SYNOP data downloaded from WIS2.0
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: wis2_synop
+              geom_field: location
+              editable: true
+
+    GTSGW_AWS:
+        type: collection
+        title: GTS to WIS2 gateway AWS
+        description: AWS data downloaded via the GTS to WIS2 gateway
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: gts_gateway_aws
+              geom_field: location
+              editable: true
+
+    GTSGW_SYNOP:
+        type: collection
+        title: GTS to WIS2 gateway SYNOP
+        description: SYNOP data downloaded via the GTS to WIS2 gateway
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: gts_gateway_synop
+              geom_field: location
+              editable: true
+
+    GTSGW_BUOY:
+        type: collection
+        title: GTS to WIS2 gateway buoy data
+        description: Buoy data downloaded via the GTS to WIS2 gateway
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: gts_gateway_buoy
+              geom_field: location
+              editable: true
+
+    GTSGW_SHIP:
+        type: collection
+        title: GTS to WIS2 gateway SHIP / surface marine data
+        description: SHIP / surface marine data downloaded via the GTS to WIS2 gateway
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: gts_gateway_ship
+              geom_field: location
+              editable: true
+
+    GTSGW_WAVE:
+        type: collection
+        title: GTS to WIS2 gateway wave data
+        description: Wave data downloaded via the GTS to WIS2 gateway
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: gts_gateway_wave
+              geom_field: location
+              editable: true
+
+    WCCDM_PIVOT:
+        type: collection
+        title: Pivot example
+        description: Example of pivoting the rows in the database to recreate the weather reports.
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: pivot
+              geom_field: location
+              editable: true
+
+    GTSGW_WATER_PROFILE:
+        type: collection
+        title: GTS to WIS2 gateway water profile data
+        description: Water profile data (TESAC, BATHY) downloaded via the GTS to WIS2 gateway
+        keywords:
+            - [synop, meteorology, AWS]
+        links:
+            - type: text/html
+              rel: canonical
+              title: Hourly Climate Observations
+              href: https://api.weather.gc.ca/collections/climate-hourly
+              hreflang: en-CA
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-03-12T00:00:00Z
+                end: null # or empty
+        crs:
+            - WGS84
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: wis2box-dm-db
+                  port: 5432 # Default 5432 if not provided
+                  dbname: wis2box
+                  user: wis2box-dm
+                  password: insecure-change-me
+                  search_path: [wccdm]
+              id_field: id
+              time_field: phenomenon_time_start
+              table: gts_gateway_water_profile
+              geom_field: location
+              editable: true

@@ -252,9 +252,11 @@ def decode_and_ingest(result):
             if uri is not None:
                 observation['observed_property'] = fetch_uri_id(ObservedProperty, uri,session)
 
-            uri = feature['properties'].get('host')
+            uri = feature['properties'].get('host','UNKNOWN')
             if uri is not None:
                 observation['host'] = fetch_uri_id(Host, uri,session)
+            else:
+                observation['host'] = fetch_uri_id(Host, "UNKNOWN", session)
 
             uri = feature['properties'].get('observer')
             if uri is not None:
@@ -271,6 +273,8 @@ def decode_and_ingest(result):
                 if k not in ("additionalProperties", "reportType", "reportIdentifier","isMemberOf"):
                     key = camel2snake(k)
                     observation[key] = v
+
+                                
 
             uri = feature['properties']['parameter']['reportType']
             if uri[0:3] == "006":
@@ -322,6 +326,7 @@ def decode_and_ingest(result):
                     LOGGER.error(o)
                     session.rollback()
         except Exception as e:
+            LOGGER.error(e)
             LOGGER.error("Error adding data, dumping to file")
             LOGGER.error(observations)
             session.rollback()
