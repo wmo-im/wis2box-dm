@@ -18,6 +18,16 @@ server:
         name: TinyDB
         connection: /tmp/pygeoapi-process-manager.db
         output_dir: /tmp/
+    resource_manager:
+        name: PostgreSQL
+        data:
+          host: wis2box-dm-db
+          port: 5432
+          dbname: wis2box
+          user: wis2box-dm
+          password: insecure-change-me
+          search_path: [pygeoapi]
+        collections_table:  collections
     cors: true
 
 logging:
