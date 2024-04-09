@@ -9,6 +9,6 @@ WORKDIR /local
 
 # install system packages
 RUN apt-get update -y && \
-    apt-get upgrade && \
+    apt-get upgrade -y && \
     apt-get install -y postgis
 

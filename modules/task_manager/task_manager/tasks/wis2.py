@@ -186,6 +186,9 @@ def download_from_wis2(job):
                     if hash_base64 == hash_expected_value:
                         save = True
                         valid_hash = True
+                    else:
+                        save = True
+                        valid_hash = False
                 else:
                     save = True
                 if save:
@@ -223,6 +226,7 @@ def download_from_wis2(job):
         result = {}
 
     # print(json.dumps(result, indent=4))
+    LOGGER.warning(json.dumps(result, indent=4))
 
     return result
 
