@@ -29,7 +29,7 @@ services:
       - default.env
     volumes:
       - "./:/local/app"
-      - postgres:/home/postgres
+      - "./pg_data:/var/lib/postgresql/data"
   # container for pygeoapi, everything as a process
   api:
     build:
@@ -82,6 +82,19 @@ services:
     tty: true
     depends_on:
       - redis
+
+  tileserver:
+    image: pramsey/pg_tileserv:20240312
+    container_name: tileserver
+    env_file:
+      - default.env
+    depends_on:
+      - database
+    ports:
+      - 7800:7800
+    entrypoint: "./pg_tileserv --debug"
+    volumes:
+      - ./config/pg_tileserv:/config
 
   # Message broker for publishing WIS2 notifications
   # and internal message bus
@@ -139,6 +152,3 @@ services:
   #    default.env
   #  depends_on:
   #    - db
-
-volumes:
-  postgres:

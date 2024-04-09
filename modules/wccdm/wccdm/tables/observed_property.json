@@ -1,0 +1,12 @@
+{
+    "non_coordinate_pressure": {"id": 0, "preferred_label":"air_pressure", "uri": "http://codes.wmo.int/bufr4/b/10/004"},
+    "pressure_reduced_to_mean_sea_level": {"id": 1, "preferred_label": "air_pressure_at_mean_sea_level", "uri": "http://codes.wmo.int/bufr4/b/10/051"},
+    "air_temperature": {"id": 2, "preferred_label": "air_temperature", "uri": "http://codes.wmo.int/bufr4/b/12/101"},
+    "dewpoint_temperature": {"id": 3, "preferred_label": "dew_point_temperature", "uri": "http://codes.wmo.int/bufr4/b/12/103"},
+    "relative_humidity": {"id": 4, "preferred_label": "relative_humidity", "uri": "http://codes.wmo.int/bufr4/b/13/009"},
+    "wind_direction": {"id": 5, "preferred_label": "wind_from_direction", "uri": "http://codes.wmo.int/bufr4/b/11/001"},
+    "wind_speed": {"id": 6, "preferred_label": "wind_speed", "uri": "http://codes.wmo.int/bufr4/b/11/002"},
+    "total_precipitation_or_total_water_equivalent": {"id": 7, "preferred_label": "precipitation_amount","uri": "http://codes.wmo.int/bufr4/b/13/011"},
+    "total_snow_depth": {"id": 8, "preferred_label": "total_snow_depth", "uri": "http://codes.wmo.int/bufr4/b/13/013"},
+    "depth_of_fresh_snow": {"id": 9, "preferred_label": "depth_of_fresh_snow", "uri": "http://codes.wmo.int/bufr4/b/13/012"}
+}

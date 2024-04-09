@@ -1,0 +1,32 @@
+{
+  "unknown": {
+    "id": 0,
+    "preferred_label": "Unknown / not specified",
+    "uri": "https://codes.wmo.int/common/13/NA"
+  },
+  "000000": {
+    "id": 1,
+    "preferred_label": "Surface data - land: hourly synoptic observations from fixed-land stations (SYNOP)",
+    "uri": "https://codes.wmo.int/common/13/0/0"
+  },
+  "000001": {
+    "id": 2,
+    "preferred_label": "Surface data - land: intermediate synoptic observations from fixed-land stations (SYNOP)",
+    "uri": "https://codes.wmo.int/common/13/0/1"
+  },
+  "000002": {
+    "id": 3,
+    "preferred_label": "Surface data - land: main synoptic observations from fixed-land stations (SYNOP)",
+    "uri": "https://codes.wmo.int/common/13/0/2"
+  },
+  "000006": {
+    "id": 4,
+    "preferred_label": "Surface data - land: one-hour observations from automated stations",
+    "uri": "https://codes.wmo.int/common/13/0/6"
+  },
+  "000007": {
+    "id": 5,
+    "preferred_label": "Surface data - land: n-minute observations from AWS stations",
+    "uri": "https://codes.wmo.int/common/13/0/7"
+  }
+}

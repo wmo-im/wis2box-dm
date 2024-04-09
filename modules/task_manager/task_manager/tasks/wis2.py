@@ -1,12 +1,10 @@
 import base64
 import datetime as dt
-#from datetime import date, datetime, UTC
 import importlib
 import json
-import logging
+from multiprocessing import Process
 import os
 from pathlib import Path
-import pickle
 import urllib3
 from urllib.parse import urlsplit
 
@@ -25,6 +23,50 @@ from task_manager.worker import app as app
 from station_metadata.utils import camel2snake
 from wccdm.schema import *
 from wccdm.utils import *
+
+
+
+observed_property_map = {
+    "non_coordinate_pressure": {"id": 0, "preferred_label":"air_pressure", "uri": "http://codes.wmo.int/bufr4/b/10/004"},
+    "pressure_reduced_to_mean_sea_level": {"id": 1, "preferred_label": "air_pressure_at_mean_sea_level", "uri": "http://codes.wmo.int/bufr4/b/10/051"},
+    "air_temperature": {"id": 2, "preferred_label": "air_temperature", "uri": "http://codes.wmo.int/bufr4/b/12/101"},
+    "dewpoint_temperature": {"id": 3, "preferred_label": "dew_point_temperature", "uri": "http://codes.wmo.int/bufr4/b/12/103"},
+    "relative_humidity": {"id": 4, "preferred_label": "relative_humidity", "uri": "http://codes.wmo.int/bufr4/b/13/009"},
+    "wind_direction": {"id": 5, "preferred_label": "wind_from_direction", "uri": "http://codes.wmo.int/bufr4/b/11/001"},
+    "wind_speed": {"id": 6, "preferred_label": "wind_speed", "uri": "http://codes.wmo.int/bufr4/b/11/002"},
+    "total_precipitation_or_total_water_equivalent": {"id": 7, "preferred_label": "precipitation_amount","uri": "http://codes.wmo.int/bufr4/b/13/011"},
+    "total_snow_depth": {"id": 8, "preferred_label": "total_snow_depth", "uri": "http://codes.wmo.int/bufr4/b/13/013"},
+    "depth_of_fresh_snow": {"id": 9, "preferred_label": "depth_of_fresh_snow", "uri": "http://codes.wmo.int/bufr4/b/13/012"}
+}
+
+report_type_map = {
+  "000000": {
+    "id": 0,
+    "preferred_label": "Surface data - land: hourly synoptic observations from fixed-land stations (SYNOP)",
+    "uri": "https://codes.wmo.int/common/13/0/0"
+  },
+  "000001": {
+    "id": 1,
+    "preferred_label": "Surface data - land: intermediate synoptic observations from fixed-land stations (SYNOP)",
+    "uri": "https://codes.wmo.int/common/13/0/1"
+  },
+  "000002": {
+    "id": 2,
+    "preferred_label": "Surface data - land: main synoptic observations from fixed-land stations (SYNOP)",
+    "uri": "https://codes.wmo.int/common/13/0/2"
+  },
+  "000006": {
+    "id": 3,
+    "preferred_label": "Surface data - land: one-hour observations from automated stations",
+    "uri": "https://codes.wmo.int/common/13/0/6"
+  },
+  "000007": {
+    "id": 4,
+    "preferred_label": "Surface data - land: n-minute observations from AWS stations",
+    "uri": "https://codes.wmo.int/common/13/0/7"
+  }
+}
+
 
 _pool = urllib3.PoolManager()
 hash_module = importlib.import_module("hashlib")
@@ -248,9 +290,12 @@ def decode_and_ingest(result):
             if uri is not None:
                 observation['observing_procedure'] = fetch_uri_id(ObservingProcedure, uri,session)
 
+
             uri = feature['properties'].get('observedProperty')
-            if uri is not None:
-                observation['observed_property'] = fetch_uri_id(ObservedProperty, uri,session)
+            observation['observed_property'] = observed_property_map.get(uri, {}).get("id", None)
+            if observation['observed_property'] is None:
+                LOGGER.warning(f"Skipping observed property: {uri}")
+                continue
 
             uri = feature['properties'].get('host','UNKNOWN')
             if uri is not None:
@@ -267,6 +312,7 @@ def decode_and_ingest(result):
             # parse date / time elements
             start, end, duration = time_parser(feature['properties']['phenomenonTime'])
             observation['phenomenon_time_start'] = start
+            observation['phenomenon_time_end'] = end
             observation['phenomenon_duration'] = f"{duration.total_seconds()} seconds"
             observation['result_time'] = feature['properties']['resultTime']
             for k, v in feature['properties']['parameter'].items():
@@ -274,13 +320,12 @@ def decode_and_ingest(result):
                     key = camel2snake(k)
                     observation[key] = v
 
-                                
 
             uri = feature['properties']['parameter']['reportType']
-            if uri[0:3] == "006":
-                LOGGER.error("Radar data, skipping")
+            observation['report_type'] = report_type_map.get(uri, {}).get("id", "unknown")
+            if observation['report_type'] is None:
+                LOGGER.warning(f"Skipping report_type: {uri}")
                 continue
-            observation['report_type'] = fetch_uri_id(ReportType, uri,session)
 
 
             uri = feature['properties']['parameter']['reportIdentifier']
@@ -330,7 +375,6 @@ def decode_and_ingest(result):
             LOGGER.error("Error adding data, dumping to file")
             LOGGER.error(observations)
             session.rollback()
-
     else:
         pass
 

@@ -48,4 +48,4 @@ RUN cd ./app && \
     pip install https://github.com/david-i-berry/bufr2geojson/archive/wccdm.zip
 
 # now the default command
-CMD ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --concurrency=16"]
+CMD ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --concurrency=16 --max-tasks-per-child 100"]
