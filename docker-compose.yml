@@ -1,15 +1,21 @@
 version: '3.3'
 
 services:
+  web-proxy:
+    container_name: nginx
+    image: nginx:alpine
+    restart: always
+    env_file:
+      - default.env
+    ports:
+      - 80:80
+    volumes:
+      - ./config/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
 
-  # container database to host
-  # - pygeoapi job manager
-  # - database of WIGOS metadata
-  # - database of observations
-  # - provenance and archive of files
-  # - crontabs / scheduled tasks?
-
-  # redis manager for download queue and celery tasks
   redis:
     container_name: redis
     build:
@@ -17,6 +23,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - 6379:6379
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
 
   database:
     build:
@@ -30,6 +40,10 @@ services:
     volumes:
       - "./:/local/app"
       - "./pg_data:/var/lib/postgresql/data"
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
   # container for pygeoapi, everything as a process
   api:
     build:
@@ -46,6 +60,10 @@ services:
       - ./tmp/pygeoapi:/tmp # ToDo - fix paths
       - ./app:/app
     tty: true
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
 #  entrypoint: ["wis2box-dm","api","serve"]
 
   subscription_manager:
@@ -66,7 +84,10 @@ services:
     tty: true
     depends_on:
       - redis
-
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
   celery:
     container_name: celery
     build:
@@ -82,7 +103,10 @@ services:
     tty: true
     depends_on:
       - redis
-
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
   tileserver:
     image: pramsey/pg_tileserv:20240312
     container_name: tileserver
@@ -91,11 +115,14 @@ services:
     depends_on:
       - database
     ports:
-      - 80:7800
+      - 7800:7800
     entrypoint: "./pg_tileserv --debug"
     volumes:
       - ./config/pg_tileserv:/config
-
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
   # Message broker for publishing WIS2 notifications
   # and internal message bus
   #broker:
@@ -129,6 +156,10 @@ services:
     env_file:
       - default.env
     tty: true
+    logging:
+      options:
+        max-size: "10M"
+        max-file: "2"
   #proxy:
   #  build:
   #    context: .
