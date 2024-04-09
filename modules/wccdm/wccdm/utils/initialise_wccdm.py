@@ -71,6 +71,10 @@ while current_date <= end_date:
 
 # create child tables
 for day in date_list:
+
+    start_date = day
+    end_date = start_date + dt.timedelta(days=1)
+
     sql_statement = """
          CREATE TABLE wccdm.observation_{date}(
              CHECK (
@@ -82,12 +86,8 @@ for day in date_list:
                s = start_date.strftime("%Y-%m-%d 00:00+0"),
                e = end_date.strftime("%Y-%m-%d 00:00+0"))
 
-    start_date = day
-    end_date = start_date + dt.timedelta(days=1)
     # Execute the SQL statement using the session and pass parameters
-    session.execute(
-        text(sql_statement)
-    )
+    session.execute(text(sql_statement))
     # Commit the changes
     session.commit()
 
