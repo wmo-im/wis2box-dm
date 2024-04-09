@@ -74,24 +74,24 @@ for day in date_list:
     sql_statement = """
          CREATE TABLE wccdm.observation_{date}(
              CHECK (
-                 phenomenon_time_end >= timestamp with time zone :start_date
-                 and phenomenon_time_end < timestamp with time zone :end_date
+                 phenomenon_time_end >= timestamp with time zone {s}
+                 and phenomenon_time_end < timestamp with time zone {e}
                  )
          ) INHERITS (wccdm.observation)    
-    """.format(date=day.strftime("%Y%m%d"))
+    """.format(date=day.strftime("%Y%m%d"),
+               s = start_date.strftime("%Y-%m-%d 00:00+0"),
+               e = end_date.strftime("%Y-%m-%d 00:00+0"))
 
     start_date = day
     end_date = start_date + dt.timedelta(days=1)
     # Execute the SQL statement using the session and pass parameters
     session.execute(
-        text(sql_statement),
-        {"start_date": start_date, "end_date": end_date}
+        text(sql_statement)
     )
     # Commit the changes
     session.commit()
 
 # now triggers
-
 sql_statement = ""
 _if = "IF"
 for day in date_list:
