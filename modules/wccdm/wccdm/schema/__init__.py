@@ -19,7 +19,7 @@ class Observation(Base):
     __tablename__ = "observation"
     __table_args__ = {"schema": "wccdm", "implicit_returning": False}
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    location = mapped_column(Geography(geometry_type='POINT', srid=4326), nullable=False)
+    location = mapped_column(Geography(geometry_type='POINT', srid=4326), nullable=False, index=True)
     z_coordinate: Mapped[dict] = mapped_column(JSONB, nullable=True)
     host: Mapped[int] = mapped_column(ForeignKey("wccdm.host.id"), nullable=False)
     observer: Mapped[int] = mapped_column(ForeignKey("wccdm.observer.id"), nullable=True)

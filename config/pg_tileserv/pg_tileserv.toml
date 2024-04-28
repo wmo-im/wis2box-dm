@@ -4,6 +4,7 @@
 DbPoolMaxConnLifeTime = "1h"
 # Hold no more than this number of connections in the database pool
 DbPoolMaxConns = 4
+DbTimeout = 10
 # Look to read html templates from this directory
 AssetsPath = "./assets"
 # Accept connections on this subnet (default accepts on all subnets)
@@ -12,13 +13,16 @@ HttpHost = "0.0.0.0"
 HttpPort = 7800
 # Advertise URLs relative to this server name
 # default is to look this up from incoming request headers
-# UrlBase = "http://yourserver.com/"
+UrlBase = "http://localhost/"
+# Optional path to add to the service base URL
+# If set, all routes will be prefixed with this path
+BasePath = "/apps/tileserver/"
 # Resolution to quantize vector tiles to
 DefaultResolution = 4096
 # Rendering buffer to add to vector tiles
 DefaultBuffer = 256
 # Limit number of features requested (-1 = no limit)
-MaxFeaturesPerTile = -1
+MaxFeaturesPerTile = 500
 # Advertise this minimum zoom level
 DefaultMinZoom = 0
 # Advertise this maximum zoom level

@@ -41,29 +41,34 @@ observed_property_map = {
 
 report_type_map = {
   "000000": {
-    "id": 0,
+    "id": 1,
     "preferred_label": "Surface data - land: hourly synoptic observations from fixed-land stations (SYNOP)",
     "uri": "https://codes.wmo.int/common/13/0/0"
   },
   "000001": {
-    "id": 1,
+    "id": 2,
     "preferred_label": "Surface data - land: intermediate synoptic observations from fixed-land stations (SYNOP)",
     "uri": "https://codes.wmo.int/common/13/0/1"
   },
   "000002": {
-    "id": 2,
+    "id": 3,
     "preferred_label": "Surface data - land: main synoptic observations from fixed-land stations (SYNOP)",
     "uri": "https://codes.wmo.int/common/13/0/2"
   },
   "000006": {
-    "id": 3,
+    "id": 4,
     "preferred_label": "Surface data - land: one-hour observations from automated stations",
     "uri": "https://codes.wmo.int/common/13/0/6"
   },
   "000007": {
-    "id": 4,
+    "id": 5,
     "preferred_label": "Surface data - land: n-minute observations from AWS stations",
     "uri": "https://codes.wmo.int/common/13/0/7"
+  },
+  "001025": {
+    "id": 6,
+    "preferred_label": "Surface data - sea: buoy",
+    "uri": "https://codes.wmo.int/common/13/1/25"
   }
 }
 
@@ -202,25 +207,25 @@ def download_from_wis2(job):
             status = "SKIPPED"
 
         result = {
-            'broker': broker,
-            'message_id': message_id,
-            'data_id': data_id,
-            'metadata_id': metadata_id,
-            'received': received,
-            'queued': queued,
-            'status': status,
-            'cache': cache,
-            'filename': str(target_directory / filename),
-            'save': save,
-            'valid_hash': valid_hash,
-            'hash_method': hash_method,
-            'expected_hash': hash_expected_value,
-            'hash_value': hash_base64,
-            'expected_length': expected_length,
-            'filesize': filesize,
-            'download_start': download_start,
-            'download_end': download_end,
-            'dataset': dataset
+            'broker': broker, # int -> varchar
+            'message_id': message_id, # varchar
+            'data_id': data_id, # varchar
+            'metadata_id': metadata_id, # int -> varchar
+            'received': received, # timestamp with timezone
+            'queued': queued, # timestamp with timezone
+            'status': status, # int -> varchar
+            'cache': cache, # int -> varchar
+            'filename': str(target_directory / filename), # varchar
+            'save': save, # bool
+            'valid_hash': valid_hash, # varchar
+            'hash_method': hash_method, # int -> varchar
+            'expected_hash': hash_expected_value, # varchar
+            'hash_value': hash_base64, # varchar
+            'expected_length': expected_length, # int
+            'filesize': filesize, # int
+            'download_start': download_start, # timestamp with time zone
+            'download_end': download_end, # timestamp with time zone
+            'dataset': dataset # int -> varchar
         }
     else:
         result = {}
@@ -326,7 +331,7 @@ def decode_and_ingest(result):
 
 
             uri = feature['properties']['parameter']['reportType']
-            observation['report_type'] = report_type_map.get(uri, {}).get("id", "unknown")
+            observation['report_type'] = report_type_map.get(uri, {}).get("id", 0)
             if observation['report_type'] is None:
                 LOGGER.warning(f"Skipping report_type: {uri}")
                 continue

@@ -78,8 +78,8 @@ for day in date_list:
     sql_statement = """
          CREATE TABLE wccdm.observation_{date}(
              CHECK (
-                 phenomenon_time_end >= timestamp with time zone {s}
-                 and phenomenon_time_end < timestamp with time zone {e}
+                 phenomenon_time_end >= timestamp with time zone '{s}'
+                 and phenomenon_time_end < timestamp with time zone '{e}'
                  )
          ) INHERITS (wccdm.observation)    
     """.format(date=day.strftime("%Y%m%d"),
@@ -88,6 +88,10 @@ for day in date_list:
 
     # Execute the SQL statement using the session and pass parameters
     session.execute(text(sql_statement))
+
+    # Now add index
+
+
     # Commit the changes
     session.commit()
 

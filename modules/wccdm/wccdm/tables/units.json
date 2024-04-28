@@ -1,0 +1,77 @@
+{
+  "m/s": {
+    "id": "1",
+    "preferred_label": "metres per second",
+    "uri": ""
+  },
+  "deg": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "hPa": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "CODE TABLE": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "Celsius": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "%": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "m": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "FLAG TABLE": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "kg m-2": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "min": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "Code table": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "J m-2": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "gpm": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "kg m-2 s-1": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  },
+  "s": {
+    "id": "",
+    "preferred_label": "",
+    "uri": ""
+  }
+}
